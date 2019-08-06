@@ -39,10 +39,9 @@ func initLoggerToFile(log *logrus.Logger, appName string) {
 	// open file
 	os.Mkdir("logs", 0755)
 
-	filename := Filename()
+	filename := Filename(appName)
 
-	LOG_FILE, _ := filepath.Abs("/app/logs/" + appName + "-" + filename)
-	// LOG_FILE, _ := filepath.Abs("./logs/" + appName + "-" + filename)
+	LOG_FILE, _ := filepath.Abs(filename)
 
 	logFile, err := os.OpenFile(LOG_FILE, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0755)
 

@@ -30,7 +30,8 @@ func AppName() string {
 	return strings.Trim(appName, " ")
 }
 
-func Filename() string {
+func Filename(appName string) string {
 	dt := time.Now()
-	return dt.Format("2006-01-02") + ".log"
+	// return "./logs/" + appName + "-" + dt.Format("2006-01-02") + ".log"
+	return "/app/logs/" + appName + "-" + dt.Format("2006-01-02") + ".log"
 }
