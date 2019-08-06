@@ -51,12 +51,17 @@ func initLoggerToFile(log *logrus.Logger, appName string) {
 
 	if !contains(allFileName, filename) {
 		allFileName = allFileName[:0]
-
 		for _, file := range allFilePointer {
-			go file.Close()
+			go func() {
+				err := file.Close()
+				if err != nil {
+					log.Fatal(err)
+				}
+			}()
 		}
 
 		allFilePointer = append(allFilePointer, logFile)
+
 		allFileName = append(allFileName, filename)
 	}
 	// defer logFile.Close()
