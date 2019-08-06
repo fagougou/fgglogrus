@@ -9,12 +9,23 @@ import (
 	"time"
 )
 
+func parentPath(path string) string {
+	index := strings.LastIndex(path, "/")
+	return path[:index]
+}
+
 func AppName() string {
-	modPath, _ := filepath.Abs("./go.mod")
-	file, err := os.Open(modPath)
+	modDirPath, _ := filepath.Abs(".")
+	file, err := os.Open(modDirPath + "/go.mod")
+	for err != nil && len(modDirPath) > 1 {
+		modDirPath = parentPath(modDirPath)
+		file, err = os.Open(modDirPath + "/go.mod")
+	}
+
 	if err != nil {
 		log.Fatalf("failed opening file: %s", err)
 	}
+
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
@@ -32,6 +43,9 @@ func AppName() string {
 
 func Filename(appName string) string {
 	dt := time.Now()
-	// return "./logs/" + appName + "-" + dt.Format("2006-01-02") + ".log"
-	return "/app/logs/" + appName + "-" + dt.Format("2006-01-02") + ".log"
+	prefix := ""
+	if os.Getenv("ENV") == "production" {
+		prefix = "/app/"
+	}
+	return prefix + "logs/" + appName + "-" + dt.Format("2006-01-02") + ".log"
 }
