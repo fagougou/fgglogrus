@@ -35,6 +35,23 @@ func contains(a []string, x string) bool {
 	return false
 }
 
+func closeFiles(files []*os.File, log *logrus.Logger) {
+	c := make(chan bool)
+	for _, file := range files {
+		go func() {
+			err := file.Close()
+			if err != nil {
+				log.Fatal(err)
+			}
+			c <- true
+		}()
+	}
+
+	for range files {
+		<-c
+	}
+}
+
 func initLoggerToFile(log *logrus.Logger, appName string) {
 	// open file
 	os.Mkdir("logs", 0755)
@@ -51,17 +68,9 @@ func initLoggerToFile(log *logrus.Logger, appName string) {
 
 	if !contains(allFileName, filename) {
 		allFileName = allFileName[:0]
-		for _, file := range allFilePointer {
-			go func() {
-				err := file.Close()
-				if err != nil {
-					log.Fatal(err)
-				}
-			}()
-		}
+		closeFiles(allFilePointer, log)
 
 		allFilePointer = append(allFilePointer, logFile)
-
 		allFileName = append(allFileName, filename)
 	}
 	// defer logFile.Close()

@@ -3,7 +3,6 @@ package fgglogrus
 import (
 	"os"
 	"testing"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -31,7 +30,7 @@ func TestCloseFile(t *testing.T) {
 
 	initLoggerToFile(log, appName2)
 
-	time.Sleep(time.Millisecond * 500)
+	// time.Sleep(time.Millisecond * 1000)
 
 	for _, oldf := range oldPointers {
 		_, err := oldf.WriteString("writes\n")
