@@ -3,6 +3,7 @@ package fgglogrus
 import (
 	"os"
 	"path/filepath"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -36,20 +37,20 @@ func contains(a []string, x string) bool {
 }
 
 func closeFiles(files []*os.File, log *logrus.Logger) {
-	c := make(chan bool)
+	var wg sync.WaitGroup
+
 	for _, file := range files {
+		wg.Add(1)
 		go func() {
 			err := file.Close()
 			if err != nil {
 				log.Fatal(err)
 			}
-			c <- true
+			wg.Done()
 		}()
 	}
 
-	for range files {
-		<-c
-	}
+	wg.Wait()
 }
 
 func initLoggerToFile(log *logrus.Logger, appName string) {
